@@ -1,0 +1,45 @@
+---
+title: "Zajęcia 4"
+author: "Magdalena"
+date: "2024-10-29"
+output: html_document
+---
+
+# Instalacja pakietu "BiocManager"
+```{r}
+install.packages("BiocManager")
+
+```
+```{r}
+if (!requireNamespace("BiocManager", quietly = TRUE)) # ta linia kodu oszczędza czas i zasoby obliczeniowe
+    install.packages("BiocManager")
+```
+
+```{r}
+BiocManager::install()
+BiocManager::install("GenomicFeatures")
+BiocManager::install("AnnotationDbi")
+BiocManager::install("ShortRead")
+BiocManager::install("Biostrings")
+```
+```{r}
+library(Biostrings)
+# Wczytanie sekwencji z pliku FASTA
+dna_seqs <- readDNAStringSet("C:/Users/magda/Downloads/examples.fasta")
+dna_seqs[1:5]
+
+```
+
+```{r}
+rev_comp_seqs <- reverseComplement(dna_seqs)
+rev_comp_seqs[1:5]
+```
+
+```{r}
+gc_content <- letterFrequency (dna_seqs, letters = C ("G" , "C"), as prob=TRUE)
+```
+
+
+
+
+
