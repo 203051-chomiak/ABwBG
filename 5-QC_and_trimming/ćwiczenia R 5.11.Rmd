@@ -1,0 +1,113 @@
+---
+title: "zajęcia 5.11"
+author: "Magdalena"
+date: "2024-11-05"
+output: html_document
+---
+
+## Zadanie 1
+
+sprawdzenie czy pakiety zostały prawidłowo zaintsalowane i załadowane:
+
+```{r}
+library(ShortRead)
+library(Rqc)
+library(Biostrings)
+
+packageVersion("ShortRead")
+packageVersion("Rqc")
+packageVersion("Biostrings")
+```
+
+## Zadanie 2
+
+Pobranie pliku FASTQ
+
+## Zadanie 3
+
+```{r}
+
+fq_file <- "C:/Users/magda/Downloads/SRR31220563.fastq.gz"
+fq_reads <- readFastq(fq_file)
+```
+
+sprawdzenie podstawowych informacji
+
+liczba odczytów:
+
+```{r}
+length(fq_reads)
+```
+
+podgląd pierwszych odczytów:
+
+```{r}
+fq_reads[1:5]
+```
+
+## Zadanie 4
+
+Generowanie obiektu z wynikami kontroli jakości
+
+```{r}
+qa_results <- qa(fq_file, type = "fastq")
+```
+
+Towrzenie raportu QC:
+
+```{r}
+report(qa_results, dest = "C:/Users/magda/OneDrive/Pulpit")
+```
+
+-   Przejrzyj raport QC i zanotuj kluczowe obserwacje dotyczące jakości danych.
+
+*Odpowiedź:*
+
+**Wykres 1** - ile jest oczytów w wersji nieprzefiltrowanej? widać 1 kropkę, czyli jedną sekwencję z taką liczbą odczytów
+
+**wykres 2** - jaki jest % nukleotydów w danej sekwencji; wygląda śmiesznie w naszej sekwencji wszystkie nukleotydy zostały odczytane n=0; nukleotydów G i C jest rochę więcej niż A i T
+
+**Wykres 3** - ocena punktowa jakości
+
+W okolicy trzydziestego odczytu osiagneła pik jakości.
+
+**Wykres 4** - dystrybucja odczytów; ile razy dana sekwencja się powtarzała; od którego odczytu nasze sekwencje stają się homogeniczne?
+
+Jest widoczne gwałtowne, wąskie przejście od niskiej do wysokiej skumulowanej proporcji odczytów, co informuje o braku/niskim błędzie w sekwencjonowaniu.
+
+ile razy powtarza sie dana sekwencja? można zauważyć że aż 158 razy wsytępuje duplikat powtarzających się nukleotydów Guaniny, na jaką skalę należy filtrować i dopasować dane?
+
+**Wykres 5** - jakośc odczytów i zliczenie ile razy dany nukleotyd występuje w danym odczycie?
+
+na początku duże wahania - błędy odczytów na początku sekwencji; od 25 cyklu odczyt się uspokaja i spada pod koniec
+
+**Wykres 6** - wynik odczytów jakości dla cyklu; porównanie kqantyli i średniej jakości dla danego odczytu, chcemy żeby oba te wykresy były do siebie zblizone
+
+Adapter Contamination gdy mamy kontaminację adapterami, czyli illumina nam ich nie wycięła to widać procent kontaminacji - w ilu sekwencjach znaleziono sekwencje adapterowe - które definiuje się w programieR w zależności jaki program do sekwencjonowania wykorzystujemy
+
+-   Przejrzyj wykresy z folderu `/images`. Czy sekwencje są dobrej jakości?
+
+*Odpowiedź:*
+
+## Zadanie 6 - Porównanie wyników kontroli jakości uzyskanych za pomocą innego pakietu Bioconductora.
+
+nie działa :(((((
+
+## Zadanie 7 - Analiza zawartości GC
+
+Obliczenie zawartości nukleotydów GC w oryginalnych odczytach
+
+```{r}
+gc_content <- letterFrequency(sread(fq_reads), letters = "GC", as.prob = TRUE)
+```
+
+Wizualizacja - histogram zawartości nukleotydów GC
+
+```{r}
+hist(gc_content, breaks = 50, main = "Zawartość GC w oryginalnych odczytach", xlab = "Procent GC")
+```
+
+-   Przeanalizuj histogram i zanotuj, czy zawartość GC jest zgodna z oczekiwaniami dla **Escherichia coli**.
+
+*Odpowiedź:* zawartośc nukleotydów GC mieści się między 0,2-0,7; ma rozkład normalny; średnia znajduje się w okolicy 0,5.
+Specyfikacja gatunku:
