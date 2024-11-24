@@ -1,0 +1,65 @@
+---
+title: '19.11'
+author: "Magdalena"
+date: "2024-11-19"
+output: html_document
+---
+
+```{r}
+library(ShortRead)
+
+# Zaimportuj plik FASTQ
+fq1 <- readFastq("C:/Users/magda/OneDrive/Pulpit/studia/2 stopień/2 semestr/Analizy bioinformatyczne w genomice/19.11/SRR31368982.fastq")
+
+# Przeprowadź analizę jakości
+qa_result <- qa("C:/Users/magda/OneDrive/Pulpit/studia/2 stopień/2 semestr/Analizy bioinformatyczne w genomice/19.11/SRR31368982.fastq", type = "fastq")
+report(qa_result, dest="C:/Users/magda/OneDrive/Pulpit/studia/2 stopień/2 semestr/Analizy bioinformatyczne w genomice/19.11")
+```
+sekwencja dosyć dobrej jakości
+powtórzenia braku odczytów: 873 razy
+
+```{r}
+
+
+library(Biostrings)
+
+ref_genome <- readDNAStringSet("C:/Users/magda/OneDrive/Pulpit/ecoli_genome.fna.gz")
+
+```
+
+```{r}
+library(Rsubread)
+buildindex(basename = "ecoli_index", reference = "C:/Users/magda/OneDrive/Pulpit/ecoli_genome.fna.gz")
+
+# Mapowanie odczytów do genomu ref.
+align(index = "ecoli_index",
+      readfile1 = "C:/Users/magda/OneDrive/Pulpit/studia/2 stopień/2 semestr/Analizy bioinformatyczne w genomice/19.11/SRR31368982.fastq",
+      input_format = "FASTQ",
+      output_file = "C:/Users/magda/OneDrive/Pulpit/studia/2 stopień/2 semestr/Analizy bioinformatyczne w genomice/19.11/aligned_sample.BAM")
+```
+```{r}
+# Analiza wyników mapowania
+
+library(GenomicAlignments)
+
+aln <- readGAlignments("/Users/arturbalicki/Desktop/Rozwiazane/cw7/aligned_sample.BAM")
+coverage_data <- coverage(aln)
+library(ggplot2)
+
+# Konwersja pokrycia do data frame
+cov_df <- as.data.frame(coverage_data[[1]])
+cov_df$position <- as.numeric(rownames(cov_df))
+
+# Wykres pokrycia
+pdf("/Users/arturbalicki/Desktop/Rozwiazane/cw7/pliku.pdf", width = 8, height = 6)
+
+ggplot(cov_df[1:25000, ], aes(x = position, y = value)) +
+  geom_line(color = "green") +
+  labs(title = "Pokrycie genomu E. coli",
+       x = "Pozycja w genomie",
+       y = "Liczba zmapowanych odczytów")
+       
+dev.off()
+```
+
+Zakończono na zadaniu nr 5
