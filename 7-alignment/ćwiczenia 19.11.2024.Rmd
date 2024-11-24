@@ -42,7 +42,7 @@ align(index = "ecoli_index",
 
 library(GenomicAlignments)
 
-aln <- readGAlignments("/Users/arturbalicki/Desktop/Rozwiazane/cw7/aligned_sample.BAM")
+aln <- readGAlignments("C:/Users/magda/OneDrive/Pulpit/studia/2 stopień/2 semestr/Analizy bioinformatyczne w genomice/19.11/aligned_sample.BAM")
 coverage_data <- coverage(aln)
 library(ggplot2)
 
@@ -51,7 +51,7 @@ cov_df <- as.data.frame(coverage_data[[1]])
 cov_df$position <- as.numeric(rownames(cov_df))
 
 # Wykres pokrycia
-pdf("/Users/arturbalicki/Desktop/Rozwiazane/cw7/pliku.pdf", width = 8, height = 6)
+pdf("C:/Users/magda/OneDrive/Pulpit/studia/2 stopień/2 semestr/Analizy bioinformatyczne w genomice/19.11.pdf", width = 8, height = 6)
 
 ggplot(cov_df[1:25000, ], aes(x = position, y = value)) +
   geom_line(color = "green") +
