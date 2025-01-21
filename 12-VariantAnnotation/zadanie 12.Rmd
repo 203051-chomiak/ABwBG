@@ -1,0 +1,29 @@
+---
+title: "zajęcia 12 Variants"
+author: "Magdalena_Chomiak"
+
+---
+
+```{r}
+#instalowanie pakietów
+packages <- (c("VariantAnnotation", "GenomicRanges", "AnnotationHub"))
+BiocManager::install(packages)
+
+```
+
+```{r}
+#wczytywanie pakietów 
+library(VariantAnnotation)
+library(GenomicRanges)
+library(AnnotationHub)
+```
+
+```{r}
+#wczytanie ścieżki do pliku 
+fl <- system.file("extdata","chr22.vcf.gz", package="VariantAnnotation")
+#wczytanie pliku 
+vcf <-readVcf(fl,"hg19")
+#podstawowe informacje o pliku 
+vcf
+```
+
