@@ -1,22 +1,27 @@
 ---
 title: "zajęcia 12 Variants"
 author: "Magdalena_Chomiak"
-
 ---
 
+# Instalowanie pakietów
+
 ```{r}
-#instalowanie pakietów
+
 packages <- (c("VariantAnnotation", "GenomicRanges", "AnnotationHub"))
 BiocManager::install(packages)
 
 ```
 
+# Wczytywanie pakietów
+
 ```{r}
-#wczytywanie pakietów 
+
 library(VariantAnnotation)
 library(GenomicRanges)
 library(AnnotationHub)
 ```
+
+# Wczytywanie i eksploracja danych
 
 ```{r}
 #wczytanie ścieżki do pliku 
@@ -27,3 +32,34 @@ vcf <-readVcf(fl,"hg19")
 vcf
 ```
 
+# Analiza jakości
+
+```{r}
+summary(qual(vcf))
+```
+
+# Filtrowanie wariantów
+
+```{r}
+vcf_filtered <- vcf[!is.na(qual(vcf)) & qual(vcf) >99, ]
+vcf_filtered
+summary(qual(vcf_filtered))
+```
+
+# Anotacja wariantów
+
+```{r}
+BiocManager::install("TxDb.Hsapiens.UCSC.hg19.knownGene")
+
+library(TxDb.Hsapiens.UCSC.hg19.knownGene)
+txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
+
+```
+
+```{r}
+gr <- rowRanges(vcf_filtered)
+loc_anno <- locateVariants(gr, txdb, AllVariants())
+head(loc_anno)
+```
+
+-   problem z niedopasowaniem nazw chromosomów i poziomów sekwencji pomiędzy obiektem `gr` (pochodzącym z `vcf_filtered`) a bazą danych `txdb` (TxDb.Hsapiens.UCSC.hg19.knownGene)
