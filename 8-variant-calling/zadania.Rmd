@@ -1,11 +1,14 @@
-# Variant Calling w R
+---
+title: "8 Variant Calling"
+author: "Magdalena_Chomiak"
+output: html_document
 ---
 
-## Zadanie 1: Instalacja i załadowanie niezbędnych pakietów
+# Variant Calling w R
 
-Zainstaluj (jeżeli jest to konieczne) i załaduj następujące pakiety z `Bioconductor`: `VariantTools`, `Rsamtools`, `GenomicRanges`, `GenomicFeatures`, `VariantAnnotation`, `BiocParallel`.
+## Instalacja i załadowanie niezbędnych pakietów
 
-**Instrukcje:**
+z `Bioconductor`: `VariantTools`, `Rsamtools`, `GenomicRanges`, `GenomicFeatures`, `VariantAnnotation`, `BiocParallel`.
 
 ```{R}
 # Instalacja menedżera pakietów Bioconductor (jeśli nie jest zainstalowany)
@@ -26,161 +29,127 @@ library(VariantAnnotation)
 library(BiocParallel)
 ```
 
----
+------------------------------------------------------------------------
 
-## Zadanie 2: Zapoznanie się z pakietami do wykrywania wariantów
-
-Jakie są najważniejsze funkcje pakietów zainstalowanych w zadaniu 1? Skorzystaj z internetu lub z funkcji pomocowych.
-
-**Instrukcje:**
-
-1. Wyświetl pomoc dla pakietu `VariantTools`:
+## Zapoznanie się z pakietami do wykrywania wariantów
 
 ```{R}
+# wyświetlenie pomocy dla pakietu
 ??VariantTools
-```
 
-2. Przeczytaj wprowadzenie do pakietu:
-
-```{R}
+#  wprowadzenie do pakietu:
 vignette("VariantTools")
 ```
 
-3. Zapoznaj się z kluczowymi funkcjami innych pakietów:
+Kluczowe funcke używanych pakietów:
 
-    - `Rsamtools`: funkcje do pracy z plikami BAM/SAM.
-    - `GenomicRanges`: operacje na zakresach genomowych.
-    - `GenomicFeatures`: tworzenie obiektów opisujących cechy genomu.
-    - `VariantAnnotation`: funkcje do anotacji i manipulacji wariantami.
+-   `VariantTools`: opisuje zastosowania pakietu VariantTools i ogólny przepływ pracy przy ładowaniu danych, wywoływaniu wariantów pojedynczej próbki i mutacji somatycznych specyficznych dla nowotworu lub innych typów wariantów specyficznych dla próbki (np. edycja RNA). Większość funkcji działa na zestawieniach (plikach BAM) lub zbiorach danych zwanych wariantami.
+-   `Rsamtools`: funkcje do pracy z plikami BAM/SAM.
+-   `GenomicRanges`: operacje na zakresach genomowych.
+-   `GenomicFeatures`: tworzenie obiektów opisujących cechy genomu.
+-   `VariantAnnotation`: funkcje do anotacji i manipulacji wariantami.
 
----
+------------------------------------------------------------------------
 
-## Zadanie 3: Konfiguracja środowiska pracy
+## Konfiguracja środowiska pracy
 
 Ustaw katalog roboczy i sprawdź dostępność danych.
 
 **Instrukcje:**
 
-1. Ustaw katalog roboczy:
+1.  Ustaw katalog roboczy:
 
 ```{R}
-setwd("/sciezka/do/katalogu")
-```
+# Ustawienie katalogu roboczego:
+setwd("C:/Users/magda/OneDrive/Pulpit/studia/2 stopień/2 semestr/Analizy bioinformatyczne w genomice/zadanie 8")
 
-2. Sprawdź, czy pliki są dostępne:
-
-```{R}
+# sprawdzenie dostępności plików:
 list.files()
 ```
 
-Upewnij się, że w katalogu znajdują się:
+W katalogu znajdują się dwa pliki:
 
-- Plik BAM z odczytami (`aligned_sample.BAM`)
-- Genom referencyjny w formacie FASTA (`ecoli_reference.fasta`)
+-   Plik BAM z odczytami (`aligned_sample.BAM`)
+-   Genom referencyjny w formacie FASTA (`ecoli_reference.fasta`)
 
----
+------------------------------------------------------------------------
 
-## Zadanie 4: Wczytanie danych
-
-Wczytaj plik BAM i genom referencyjny. Zindeksuj plik FASTA.
-
-**Instrukcje:**
-
-1. Wczytaj plik BAM:
+## Wczytanie danych
 
 ```{R}
-bamfile <- "ścieżka/do/pliku/aligned_sample.BAM"
+# Wczytanie pliku BAM:
+bamfile <- "C:/Users/magda/OneDrive/Pulpit/studia/2 stopień/2 semestr/Analizy bioinformatyczne w genomice/zadanie 8/aligned_sample.BAM"
 bam <- BamFile(bamfile)
-```
 
-2. Wczytaj genom referencyjny:
-
-```{R}
-ref_genome <- "ścieżka/do/pliku/ecoli_reference.fasta"
+# Wczytanie genomu referencyjnego:
+ref_genome <- "C:/Users/magda/OneDrive/Pulpit/studia/2 stopień/2 semestr/Analizy bioinformatyczne w genomice/zadanie 8/ecoli_reference.fasta"
 fa <- FaFile(ref_genome)
 ```
 
-
-3. Przesortuj plik BAM według współrzędnych
-
 ```{r}
+# Przesortowanie pliku BAM według współrzędnych:
+
 # Zdefiniuj ścieżkę wejściową i wyjściową
-input_bam <- "ścieżka/do/pliku/aligned_sample.BAM"
-output_bam <- "ścieżka/do/pliku/sorted_aligned_sample.BAM"
+input_bam <- "C:/Users/magda/OneDrive/Pulpit/studia/2 stopień/2 semestr/Analizy bioinformatyczne w genomice/zadanie 8/aligned_sample.BAM"
+output_bam <- "C:/Users/magda/OneDrive/Pulpit/studia/2 stopień/2 semestr/Analizy bioinformatyczne w genomice/zadanie 8/sorted_aligned_sample.BAM"
 
 # Wykonaj sortowanie
 sortBam(file = input_bam, destination = output_bam, overwrite = TRUE)
 
 #Zdefiniuj przesortowany plik
-sorted_bam <- "ścieżka/do/pliku/sorted_aligned_sample.BAM.bam"    
+sorted_bam <- "C:/Users/magda/OneDrive/Pulpit/studia/2 stopień/2 semestr/Analizy bioinformatyczne w genomice/zadanie 8/sorted_aligned_sample.BAM.bam"    
 ```
 
-4. Indeksuj plik FASTA, jeśli indeks nie istnieje, oraz przesortowany plik BAM:
-
 ```{R}
+# Indeksowanie pliku FASTA, jeśli indeks nie istnieje, oraz przesortowanego pliku BAM:
 indexFa(ref_genome)
 indexBam(sorted_bam)
 ```
 
----
+------------------------------------------------------------------------
 
-## Zadanie 5: Kontrola jakości danych sekwencyjnych
+## Kontrola jakości danych sekwencyjnych przed wykrywaniem wariantów.
 
-Przeprowadź podstawową kontrolę jakości danych sekwencyjnych przed wykrywaniem wariantów.
-
-**Instrukcje:**
-
-1. Sprawdź nagłówek pliku BAM:
+1.  Sprawdź nagłówek pliku BAM:
 
 ```{R}
+# Sprawdzenie nagłówka
 scanBamHeader(bam)
-```
 
-2. Sprawdź podstawowe statystyki pliku BAM:
-
-```{R}
+# Sprawdzenie podtsawowych statystyk
 idxstats <- idxstatsBam(sorted_bam)
 print(idxstats)
 ```
 
-3. Oblicz i opcjonalnie zwizualizuj pokrycie genomu:
-
 ```{R}
+# Obliczenie i wizualizacja pokrycia genomu
 coverage_data <- coverage(sorted_bam)
 summary(coverage_data[[1]]) # dla genomów prokariota
-```
 
-```{r}
 plot(coverage_data[[1]], main="Pokrycie genomu dla sekwencji U00096.3", ylab="Pokrycie", xlab="Pozycja w genomie") # uwaga: zajmuje dużo czasu
 
 ```
 
----
+------------------------------------------------------------------------
 
-## Zadanie 6: Wykrywanie wariantów
-
-Wykryj warianty za pomocą funkcji `callVariants()`.
-
-**Instrukcje:**
-
-1. Zdefiniuj parametry skanowania za pomocą `pileup()` z pakietu `Rsamtools`.
+## Wykrywanie wariantów za pomocą funkcji `callVariants()`.
 
 ```{R}
-# Ustaw parametry pileup
+# Definiowanie parametrów skanowania
+# parametry pileup
 pileup_param <- PileupParam(
     distinguish_strands = FALSE,
     distinguish_nucleotides = TRUE,
     min_base_quality = 20
 )
 
-# Wykonaj pileup
+# Wykonanie pileup
 pile <- pileup(sorted_bam, scanBamParam = ScanBamParam(), pileupParam = pileup_param)
 
 ```
 
-2. Konwertuj dane pileup do ramki danych z uzgodnieniem nazw sekwencji
-
 ```{r}
+# konwertowanie danych pinelup do ramkni danych z uzgodnieniem nazw sekwencji:
 library(dplyr)
 
 pile_df <- pile_df %>%
@@ -189,8 +158,8 @@ pile_df <- pile_df %>%
 
 ```
 
-3. Pogrupuj dane według pozycji - czekamy cierpliwie!
 ```{r}
+# pogrupowanie danych względem pozycji:
 variant_candidates <- pile_df %>%
     group_by(seqnames, pos) %>%
     summarise(
@@ -221,13 +190,13 @@ variant_candidates <- pile_df %>%
 ```
 
 ```{r}
-# Przykład wyświetlenia wariantów
+# Przykład wyświetlenia wariantów:
 head(variant_candidates)
 ```
 
----
+------------------------------------------------------------------------
 
-## Zadanie 7: Filtracja i eksportowanie wyników do pliku
+## Filtracja i eksportowanie wyników do pliku
 
 ```{r}
 # Filtracja wariantów na podstawie jakości i głębokości pokrycia
@@ -242,37 +211,7 @@ cat("Liczba wariantów po filtrowaniu:", nrow(filtered_variants), "\n")
 df_variants <- as.data.frame(filtered_variants)
 
 # Eksport do pliku CSV
-write.csv(df_variants, "ścieżka/do/pliku/wyniki_wariantow.csv", row.names = FALSE)
+write.csv(df_variants, "C:/Users/magda/OneDrive/Pulpit/studia/2 stopień/2 semestr/Analizy bioinformatyczne w genomice/zadanie 8/wyniki_wariantow.csv", row.names = FALSE)
 ```
----
 
-## Zadanie 10: Podsumowanie i dyskusja
-
-**Pytania do refleksji:**
-
-1. **Jakie czynniki mogą wpływać na dokładność wykrywania wariantów?**
-
-    - Jakość danych sekwencyjnych.
-    - Głębokość pokrycia.
-    - Użyte parametry w procesie variant calling.
-    - Błędy w mapowaniu odczytów do genomu referencyjnego.
-
-2. **Dlaczego filtrowanie wariantów jest istotne?**
-
-    - Usuwa fałszywie pozytywne warianty.
-    - Poprawia wiarygodność wyników.
-    - Skupia analizę na najbardziej istotnych biologicznie wariantach.
-
-3. **Jakie są potencjalne źródła błędów w procesie variant calling?**
-
-    - Błędy sekwencjonowania.
-    - Niewłaściwe mapowanie odczytów.
-    - Artefakty PCR.
-    - Zanieczyszczenia próbek.
-
-4. **Jakie są kolejne kroki po wykryciu wariantów?**
-
-    - Anotacja wariantów (będzie tematem kolejnych zajęć).
-    - Analiza funkcjonalna.
-    - Interpretacja kliniczna (jeśli dotyczy).
----
+------------------------------------------------------------------------
