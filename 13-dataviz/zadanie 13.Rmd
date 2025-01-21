@@ -4,7 +4,8 @@ author: "Magdalena_Chomiak"
 date: 
 output: html_document
 ---
-# Wykresy eksploracyjne
+
+## 1. Wykresy eksploracyjne
 
 ```{r}
 # install.packages("ggplot2") 
@@ -35,9 +36,7 @@ ggplot(iris, aes(x=Species, y=Sepal.Width, fill=Species)) +
   labs(title="Violin + Boxplot - Iris")
 ```
 
-
-
-# Stacked Bar Plot (skumulowane słupki)
+## 2. Stacked Bar Plot (skumulowane słupki)
 
 ```{r}
 # Dane przykładowe
@@ -52,7 +51,10 @@ ggplot(df_bar, aes(x=Sample, y=Count, fill=Category)) +
   labs(title="Skumulowany wykres słupkowy")
 ```
 
-# Waffle Plot
+## 3. Waffle Plot
+
+-   wizualizacja danych, która przedstawia skład procentowy różnych kategorii w formie siatki prostokątów lub kwadratów. Każdy mały kwadrat (lub prostokąt) reprezentuje określoną liczbę jednostek lub procent całości.
+-   Jest to alternatywa dla wykresów kołowych lub słupkowych, szczególnie przydatna do przedstawiania udziałów w całości w sposób bardziej intuicyjny.
 
 ```{r}
 # install.packages("waffle")  # w razie potrzeby
@@ -65,8 +67,10 @@ waffle(parts, rows=5,
        legend_pos = "bottom")
 ```
 
+## 4. Time Series Plot (analiza czasowa)
 
-# Time Series Plot (analiza czasowa)
+-   rodzaj wykresu, który przedstawia dane zebrane w czasie.
+-   powszechnie stosowany w analizie szeregów czasowych, czyli badaniu zmienności danych w zależności od czasu. Wykres szeregów czasowych umożliwia identyfikację trendów, wzorców sezonowych, wahań cyklicznych oraz anomalii w danych.
 
 ```{r}
 # Dane przykładowe (np. ekspresja genu w 5 punktach czasowych, dla 2 genów)
@@ -82,10 +86,12 @@ ggplot(df_time, aes(x=Time, y=Expression, color=Gene)) +
   labs(title="Analiza czasowa ekspresji genów")
 ```
 
+## 5. Waterfall Plot
 
-# Waterfall Plot
+### 5.1: Klasyczny Waterfall (prosta wersja)
 
-## 5a. Klasyczny Waterfall (prosta wersja)
+-   wykres słupkowy używany do wizualizacji zmian wartości w miarę dodawania lub odejmowania różnych komponentów w serii.
+-   przydatny do pokazania, jak różne czynniki wpływają na wartość początkową, prowadząc do wartości końcowej.
 
 ```{r}
 # Dane sztuczne: zmiana wielkości guza w % (hipotetyczny przykład)
@@ -100,15 +106,22 @@ df_wf <- df_wf[order(df_wf$Zmiana), ]
 # Prosty "waterfall" z ggplot2 (barplot z uporządkowanymi słupkami)
 df_wf$Pacjent <- factor(df_wf$Pacjent, levels=df_wf$Pacjent)  # kolejność
 
+install.packages("ggplot2")
+library(ggplot2)
+
 ggplot(df_wf, aes(x=Pacjent, y=Zmiana, fill=Zmiana>0)) +
   geom_bar(stat="identity") +
   coord_flip() +
   scale_fill_manual(values=c("red","forestgreen"), name="Zmiana dodatnia?") +
   labs(title="Klasyczny Waterfall Plot - Zmiana wielkości",
        x="Pacjent", y="Zmiana (%)")
+
+
+
+
 ```
 
-## 5b. Waterfall w analizach mutacji (pakiet maftools)
+### 5.2: Waterfall w analizach mutacji (pakiet maftools)
 
 ```{r}
 BiocManager::install("maftools")
@@ -119,10 +132,12 @@ laml <- read.maf(maf = laml.maf)
 oncoplot(maf = laml, top=10)  # typowy "onco waterfall" w stylu mutacji
 ```
 
+## 6. Volcano Plot
 
-# Volcano Plot
+-   rodzaj wykresu używanego głównie w badaniach biologicznych, takich jak analiza danych z badań genetycznych lub proteomicznych.
+-   wykres przedstawia logarytmicznie przekształcone wartości p (statystycznej istotności) na osi Y i logarytmiczne przekształcenie stosunku zmiany (fold change) na osi X. Jego kształt przypomina wulkan, co dało mu nazwę.
 
-## Metoda 1: base R (przykład minimalny)
+### 6.1: base R (przykład minimalny)
 
 ```{r}
 # Przykładowe dane
@@ -143,11 +158,16 @@ abline(h=-log10(0.05), col="red", lty=2)
 abline(v=c(-1, 1), col="blue", lty=2)
 ```
 
-### Metoda 2: pakiet EnhancedVolcano
+### 6.2: pakiet EnhancedVolcano
 
 ```{r}
-# BiocManager::install("EnhancedVolcano")
+# nie odczytuje pakietu EnchacedVolcano, dlatego:
+if (!requireNamespace("BiocManager", quietly = TRUE)) {
+  install.packages("BiocManager")
+}
+BiocManager::install("EnhancedVolcano")
 library(EnhancedVolcano)
+
 
 # Dane przykładowe - minimalnie
 EnhancedVolcano(df_volcano,
@@ -161,7 +181,10 @@ EnhancedVolcano(df_volcano,
   legendPosition = "right")
 ```
 
-# Heatmap
+## 7. Heatmap
+
+-   graficzna reprezentacja danych, w której wartości są przedstawiane za pomocą koloru.
+-   powszechnie stosowana metoda wizualizacji dużych zbiorów danych, umożliwiająca szybkie zrozumienie wzorców, trendów lub anomalii w danych.
 
 ```{r}
 install.packages("pheatmap")
@@ -180,10 +203,12 @@ pheatmap(mat,
          main="Heatmap - 10 genów x 5 próbek")
 ```
 
+## 8. Wykresy redukcji wymiarów (PCA, t-SNE)
 
-# Wykresy redukcji wymiarów (PCA, t-SNE)
+### 8.1: PCA
 
-## 8a. PCA
+-   Principal Component Analysis to grafika przedstawiająca wyniki analizy głównych składowych (PCA), która jest techniką statystyczną służącą do redukcji wymiarowości danych.
+-   identyfikuje nowe, niezależne wymiary (składowe główne), które najlepiej wyjaśniają zmienność danych.
 
 ```{r}
 data(iris)
@@ -200,7 +225,10 @@ ggplot(pca_df, aes(x=PC1, y=PC2, color=Species)) +
   labs(title="PCA - Iris")
 ```
 
-## 8b. t-SNE
+### 8.2: t-SNE
+
+-   t-Distributed Stochastic Neighbor Embedding to metoda redukcji wymiarowości danych, która jest powszechnie używana do wizualizacji wysokoodmianowych danych, takich jak dane wejściowe w naukach biomedycznych, tekstowych czy obrazowych.
+-   mapuje punkty wysokiej wymiarowości na dwuwymiarową przestrzeń (lub trójwymiarową), tak aby możliwe było ich wizualne przedstawienie.
 
 ```{r}
 # install.packages("Rtsne")
@@ -227,8 +255,10 @@ ggplot(tsne_df, aes(x=X, y=Y, color=Species)) +
 
 ```
 
+## 9. Manhattan Plot
 
-# Manhattan Plot
+-   rodzaj wykresu używanego głównie w analizach genomicznych, takich jak badania związane z stowarzyszeniem genotypu z fenotypem (GWAS - Genome-Wide Association Studies).
+-   przedstawia wyniki testów asocjacji genetycznych w sposób graficzny, umożliwiający wizualizację pozycji genomu oraz poziomu istotności statystycznej dla każdej pozycji.
 
 ```{r}
 # install.packages("qqman")
@@ -247,9 +277,10 @@ manhattan(df_gwas,
           main="Przykładowy Manhattan Plot")
 ```
 
-# Venn Diagrams i UpSet Plots
+## 10. Venn Diagrams
 
-## diagram Venna
+-   narzędzie wizualizacji używane do przedstawiania interakcji między różnymi zestawami danych.
+-   szczególnie przydatne do porównywania i wizualizacji wspólnych elementów lub przekrojów pomiędzy różnymi grupami lub zestawami.
 
 ```{r}
 # install.packages("VennDiagram")
@@ -271,7 +302,10 @@ grid.newpage()
 grid.draw(venn)
 ```
 
-## UpSet Plot
+## 11. UpSet Plot
+
+-   rodzaj wykresu używanego do przedstawiania zbiorów danych w sposób, który uwidacznia interakcje między różnymi zestawami, zestawami częściowymi oraz unikatowymi elementami.
+-   przydatny do analizy i wizualizacji danych, gdzie relacje między zestawami są bardziej skomplikowane niż w klasycznych diagramach Venn.
 
 ```{r}
 # install.packages("UpSetR")
@@ -289,8 +323,10 @@ upset(fromList(listInput),
       sets.bar.color = "tomato")
 ```
 
+## 12. Pathway and Annotation Plots (np. KEGG)
 
-# Pathway and Annotation Plots (np. KEGG)
+-   wizualizacje używane głównie w analizach biologicznych i omicznych danych, takich jak genomika, proteomika czy metabolomika.
+-   wykresy przedstawiają związki i relacje między genami, białkami, szlakami metabolicznymi lub innymi elementami biologicznymi, pomagając w zrozumieniu funkcji genów lub białek w kontekście sieci biologicznych.
 
 ```{r}
 BiocManager::install("pathview")
@@ -306,8 +342,10 @@ pv.out <- pathview(gene.data = genelist,
                    out.suffix="example")
 ```
 
+## 13. Drzewo filogenetyczne
 
-# Drzewo filogenetyczne
+-   graficzne przedstawienie ewolucyjnych relacji między różnymi gatunkami, organizmami lub genami.
+-   przedstawia historię ewolucyjną i powiązania między różnymi liniami rozwoju lub taksonami, pokazując, jak różne grupy organizmów lub genów pochodzą od wspólnych przodków.
 
 ```{r}
 # install.packages("ape")
@@ -317,7 +355,10 @@ tree <- rtree(10)  # losowe drzewo z 10 taksonami
 plot(tree, main="Random Phylogenetic Tree")
 ```
 
-# Synteny Plots (np. genoPlotR)
+## 14. Synteny Plots (np. genoPlotR)
+
+-   graficzne przedstawienie relacji między genomami różnych organizmów, gdzie pokazuje się zbieżność lub różnice w układzie genów na chromosomach.
+-   wykresy pomagają zrozumieć konserwatywność genomu, ewolucję genów i ich lokalizację w kontekście innych organizmów.
 
 ```{r}
 install.packages("genoPlotR")
@@ -333,8 +374,9 @@ plot_gene_map(dna_segs = barto$dna_segs,
               main = "Synteny plot - Bartonella genomes (genoPlotR)")
 ```
 
+## 15. Circos Plots
 
-# Circos Plots
+-   wykresy używane do wizualizacji danych w sposób, który pozwala na jednoczesne przedstawienie wielu różnych cech lub danych, takich jak rozmieszczenie genów, różnice genomowe, regiony regulacyjne, warianty genetyczne i inne złożone relacje.
 
 ```{r}
 install.packages("circlize")
@@ -342,6 +384,7 @@ library(circlize)
 ```
 
 Przygotwoanie zakresów sektorów
+
 ```{r}
 library(dplyr)
 library(circlize)
@@ -362,7 +405,6 @@ chr_ranges <- bed %>%
   )
 
 ```
-
 
 ```{r}
 library(circlize)
@@ -412,8 +454,10 @@ for(i in seq_len(nrow(bed))) {
 circos.clear()
 ```
 
+## 16. Ideograms (np. karyoploteR)
 
-# Ideograms (np. karyoploteR)
+-   schematy graficzne przedstawiające strukturę chromosomów, zazwyczaj używane do wizualizacji genomów, porównania ich segmentów, lokalizacji genów oraz innych elementów struktury genomu.
+-   często używane w analizie genomiki strukturalnej i porównawczej.
 
 ```{r}
 BiocManager::install("karyoploteR")
